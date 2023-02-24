@@ -5,6 +5,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApp.Module.Extension;
+
 
 namespace CryptoApp.Module.CryptoLogic
 {
@@ -25,6 +27,12 @@ namespace CryptoApp.Module.CryptoLogic
         public string Symbol { get; set; }
         public double Current_Price { get; set; }
         public double Price_Change_Percentage_24h { get; set; }
+    }
+    public class SellByItem
+    {
+        public string IN { get; set; }
+        public string TO { get; set; }
+        public string URL { get; set; }
     }
     public class AssetsFull
     {
@@ -235,6 +243,33 @@ namespace CryptoApp.Module.CryptoLogic
 
 
                         Console.WriteLine(result);
+                    }
+                    else
+                    {
+                        Console.WriteLine("Request failed with status code: " + response.StatusCode);
+                    }
+                }
+                return null;
+            }
+            public static async Task<ObservableCollection<SellByItem>> GetPriceAcsessAsync(AssetsBase obj)
+            {
+                ObservableCollection < SellByItem > returns = new ObservableCollection<SellByItem> ();
+                using (var httpClient = new HttpClient())
+                {
+                    var response = await httpClient.GetAsync($"https://api.coingecko.com/api/v3/coins/{obj.Name.ToLower().Replace(new char[] { '[', ']' }, "").Replace(" ", "-")}");
+                    
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = await response.Content.ReadAsStringAsync();
+                        var data = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);  
+                        foreach(var item in data.tickers)
+                        
+                            returns.Add( new SellByItem() { IN=item["base"].ToString(),TO=item.target.ToString(),URL=item.trade_url.ToString() });
+                        return returns;
+                        //ObservableCollection<AssetsBase> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsBase>>(result);
+                        //return currencies;
+
+
                     }
                     else
                     {

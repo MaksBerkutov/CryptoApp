@@ -22,7 +22,6 @@ namespace CryptoApp
     {
         public MainWindow()
         {
-           
 
             InitializeComponent();
             this.DataContext = new Module.ViewModel.MainWindowViewModel(WpfPlot1);

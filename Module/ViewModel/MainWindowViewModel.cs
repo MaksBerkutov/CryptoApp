@@ -9,24 +9,34 @@ using CryptoApp.Module.Extension;
 
 namespace CryptoApp.Module.ViewModel
 {
-    
+    public enum Theme
+    {
+        White,
+        Black
+    }
     public class MainWindowViewModel:Base.ViewModel
     {
         private static readonly Dictionary<string, string[]> LANG_VALUE = new Dictionary<string, string[]>()
         {
             {"En",new string[] {"Result","More Info","Name","Symbol", "Current Price", "Price Change 24h", "Full Info", "Assets","To","Menu", "Base Converter", "Settings", "Max Item", "Finder", //13
                 "Description", "Assets ID", "Current Price", "Website", "Status", "Pegged", "Volume 24 h","Change 1 hours","Change 24 hours","Change 7 day","Created At","Updated At","Circulating supply","Max supply","Market cap",
-                "Total supply","Full diluted market cap","Go To Site","Count Point Min=2 Max=2000","Cryptographic","Lang","Themes","","","","" } },
-              {"Ру",new string[] {"Результат","Подробнее","Название","Символ", "Текущяя цена", "Изменение цены 24h", "Вся информация", "Монеты","К","Меню", "Базовая конвертация", "Настройки", "Максимум элементов", "Поиск", //13
-                "Описание", "Монеты ID", "Текуцяя цена", "Веб сайт", "Статус", "Pegged", "Volume 24 h","Изменения за 1 час","Изменения за 24 час","Изменения за 7 дней","Создано в","Обновленно в","Circulating supply","Max supply","Market cap",
-                "Total supply","Full diluted market cap","На сайт","Количество точек Минимум=2 Максимум=2000","Крипто-график","Язык","Тема","","","","" } },
+                "Total supply","Full diluted market cap","Go To Site","Count Point Min=2 Max=2000","Cryptographic","Lang","Themes","Trade" } },
+             {"Укр",new string[] {"Результат","Докладніше","Назва","Символ", "Поточна ціна", "Зміна ціни 24h", "Вся інформація", "Монети","К","Меню", "Базова конвертація", " Налаштування", "Максимум елементів", "Пошук",
+                 "Опис", "Монети ID", "Текуця ціна", "Веб сайт", "Статус", "Прив'язаний", "Обсяг за 24 години", "Зміни за 1 годину", "Зміни за 24 години", "Зміни за 7 днів","Створено в","Оновлено в","Зворотна пропозиція","Максимальна пропозиція","Ринкова капіталізація",
+                 "Загальна пропозиція","Повна розводнена ринкова капіталізація","На сайт","Кількість точок Мінімум=2 Максимум=2000","Крипто-графік","Мова","Тема","Трейд" } },
+              {"Ру",new string[] {"Результат","Подробнее","Название","Символ", "Текущяя цена", "Изменение цены 24h", "Вся информация", "Монеты","К","Меню", "Базовая конвертация", "Настройки", "Максимум элементов", "Поиск", 
+                "Описание", "Монеты ID", "Текуцяя цена", "Веб сайт", "Статус", "Привязан", "Обём за 24 часа","Изменения за 1 час","Изменения за 24 час","Изменения за 7 дней","Создано в","Обновленно в","Оборотное предложение","Максимальное предложение","Рыночная капитализация",
+                "Общее предложение","Полная разводненная рыночная капитализация","На сайт","Количество точек Минимум=2 Максимум=2000","Крипто-график","Язык","Тема","Трейд" } },
         };
 
         public Base.Command GoToSite { get; }
+        public Base.Command GoToTrade { get; }
         private ObservableCollection<string> _lang;
         private ObservableCollection<CryptoLogic.AssetsBase> _assetcItems;
         private CryptoLogic.AssetsBase _assetcSelectedItems;
         private CryptoLogic.AssetsBase _assetcSelectedItemsConvert;
+        private ObservableCollection<CryptoLogic.SellByItem> _sellitems;
+        private CryptoLogic.SellByItem _sellitemsselceted;
         private CryptoLogic.AssetsFull _assetsFull;
         private int _defaultTop = 20;
         private double _convertToCount = 0;
@@ -35,21 +45,34 @@ namespace CryptoApp.Module.ViewModel
         private int _countOfPoint = 720;
         private string _selectedLang = "En";
         private ScottPlot.WpfPlot _plot;
+        private string _selectedTheme = "White";
+
         public MainWindowViewModel(ScottPlot.WpfPlot plot)
         {
              
             _lang = new ObservableCollection<string> (LANG_VALUE[_selectedLang]);
             _plot = plot;
             GoToSite = new Base.Command(GoToSiteHandler);
+            GoToTrade = new Base.Command(GoToTradeHandler);
             _assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(_defaultTop));
             
+        }
+        private void GoToTradeHandler(object obj)
+        {
+            if(_sellitemsselceted!=null)
+                Process.Start(_sellitemsselceted.URL);
+
         }
         private void GoToSiteHandler(object obj)
         {
             Process.Start($"https://www.coingecko.com/en/coins/{_assetcSelectedItems.Name.ToLower().Replace(new char[] {'[',']' },"").Replace(" ","-")}");
         }
         //async
-       
+        public async Task LoadSellItems()
+        {
+            if (_assetcSelectedItems != null)
+               SellItems = await CryptoLogic.CryptingUp.CryptingUpApi.GetPriceAcsessAsync(_assetcSelectedItems);
+        }
         public async Task LoadFullInfo()
         {
             if (_assetcSelectedItems != null)
@@ -79,6 +102,38 @@ namespace CryptoApp.Module.ViewModel
 
         }
         //Object
+        public ObservableCollection<CryptoLogic.SellByItem> SellItems
+        {
+            get => _sellitems;
+            set
+            {
+                _sellitems = value;
+                OnPropertyChanged(nameof(SellItems));
+            }
+        }
+        public CryptoLogic.SellByItem SellItemsSelected
+        {
+            get => _sellitemsselceted;
+            set
+            {
+                _sellitemsselceted = value;
+                OnPropertyChanged(nameof(SellItemsSelected));
+            }
+        }
+
+        public string[] AllTheme => System.Enum.GetNames(typeof(Theme));
+        public string SelectedTheme
+        {
+            get { return _selectedTheme; }
+            set
+            {
+                if (_selectedTheme != value)
+                {
+                    _selectedTheme = value;
+                    OnPropertyChanged(nameof(SelectedTheme));
+                }
+            }
+        }
         public string[] AllLang => LANG_VALUE.Keys.ToArray();
         public string SelectedLang
         {
@@ -90,6 +145,7 @@ namespace CryptoApp.Module.ViewModel
                 _selectedLang = value;
             }
         }
+        public string Title => "CryptoApp";
         public int CountOfPoint
         {
             get => _countOfPoint;
@@ -99,6 +155,7 @@ namespace CryptoApp.Module.ViewModel
                 {
                     _countOfPoint = value;
                     BuildGraphics();
+                    
 
                     OnPropertyChanged(nameof(CountOfPoint));
                 }
@@ -191,6 +248,7 @@ namespace CryptoApp.Module.ViewModel
                 {
                     _assetcSelectedItems = value;
                     ConvertToCount = _convertToCount;
+                    LoadSellItems();
                     LoadFullInfo();
                     BuildGraphics();
                     OnPropertyChanged(nameof(AassetcSelectedItems));
