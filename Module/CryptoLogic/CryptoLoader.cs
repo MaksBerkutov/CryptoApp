@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace CryptoApp.Module.CryptoLogic
 {
-   
-    public class AssetsFull
+   public class CryptoPoint
+    {
+        public TimeSpan Time => new TimeSpan(time);
+        public long time { get; set; }
+        public double high { get; set; }
+        public double low { get; set; }
+    }
+    public class AssetsBase
     {
 
 
@@ -19,6 +25,27 @@ namespace CryptoApp.Module.CryptoLogic
         public string Symbol { get; set; }
         public double Current_Price { get; set; }
         public double Price_Change_Percentage_24h { get; set; }
+    }
+    public class AssetsFull
+    {
+      
+        public string asset_id { get; set; }
+        public string status { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public string website { get; set; }
+        public string pegged { get; set; }
+        public double volume_24h { get; set; }
+        public double change_1h { get; set; }
+        public double change_24h { get; set; }
+        public double change_7d { get; set; }
+        public DateTime created_at { get; set; }
+        public DateTime updated_at { get; set; }
+        public double total_supply { get; set; }
+        public double circulating_supply { get; set; }
+        public double max_supply { get; set; }
+        public long market_cap { get; set; }
+        public long full_diluted_market_cap { get; set; }
     }
     public class ExchangeMarkets
     {
@@ -84,7 +111,7 @@ namespace CryptoApp.Module.CryptoLogic
         {
            
             private static readonly string BaseUrl = "https://cryptingup.com/api";
-            //Отримуємо всі біржі
+            //Отримуємо всі біржі  == Не знадобилося
             public static async Task<ObservableCollection<CryptingExchanges>> GetExchanges()
             {
                
@@ -113,7 +140,7 @@ namespace CryptoApp.Module.CryptoLogic
 
             }
             //Отримання обмінних пунктів
-            //Наступні елементиCount елементів ринку
+            //Наступні елементиCount елементів ринку == Не знадобилося тому нема функції для повернення на сторінку назад
             public static async Task GetNextMarketsAsync(List<ExchangeMarkets> cryptoItems)
             {
                 cryptoItems = null;
@@ -172,8 +199,8 @@ namespace CryptoApp.Module.CryptoLogic
                     }
                 }
             }
-
-            public static  ObservableCollection<AssetsFull> GetAssetsFull(int def)
+            //Отримання топу крипто монет
+            public static  ObservableCollection<AssetsBase> GetAssetsBase(int def)
             {
                 using (var httpClient = new HttpClient())
                 {
@@ -182,7 +209,7 @@ namespace CryptoApp.Module.CryptoLogic
                     if (response.IsSuccessStatusCode)
                     {
                         var result =  response.Content.ReadAsStringAsync().Result;
-                        ObservableCollection<AssetsFull> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsFull>>(result);
+                        ObservableCollection<AssetsBase> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsBase>>(result);
                         return currencies;
 
 
@@ -194,7 +221,7 @@ namespace CryptoApp.Module.CryptoLogic
                 }
                 return null;
             }
-            public static async Task<ObservableCollection<AssetsFull>> GetAssetsFullAsync(int def)
+            public static async Task<ObservableCollection<AssetsBase>> GetAssetsBaseAsync(int def)
             {
                 using (var httpClient = new HttpClient())
                 {
@@ -203,7 +230,7 @@ namespace CryptoApp.Module.CryptoLogic
                     if (response.IsSuccessStatusCode)
                     {
                         var result = await response.Content.ReadAsStringAsync();
-                        ObservableCollection<AssetsFull> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsFull>>(result);
+                        ObservableCollection<AssetsBase> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsBase>>(result);
                         return currencies;
 
 
@@ -213,6 +240,92 @@ namespace CryptoApp.Module.CryptoLogic
                     {
                         Console.WriteLine("Request failed with status code: " + response.StatusCode);
                     }
+                }
+                return null;
+            }
+            //Отримманя всіх бірж на яких можна купити крипто монету
+            public static void GetExchangesInAssets(AssetsBase obj)
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var response = httpClient.GetAsync($"{BaseUrl}/assets/{obj.Symbol.ToUpper()}/markets").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = response.Content.ReadAsStringAsync().Result;
+                        //ObservableCollection<AssetsBase> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsBase>>(result);
+                        //return currencies;
+
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Request failed with status code: " + response.StatusCode);
+                    }
+                }
+            }
+
+            public static AssetsFull GetFullAssets(AssetsBase obj)
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var response = httpClient.GetAsync($"{BaseUrl}/assets/{obj.Symbol.ToUpper()}").Result;
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = response.Content.ReadAsStringAsync().Result;
+                   
+                        return Newtonsoft.Json.JsonConvert.DeserializeObject<AssetsFull>((Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result).asset.ToString()));
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Request failed with status code: " + response.StatusCode);
+                    }
+
+                }
+                return null;
+            }
+            public static async Task<AssetsFull> GetFullAssetsAsync(AssetsBase obj)
+            {
+                using (var httpClient = new HttpClient())
+                {
+                    var response = await httpClient.GetAsync($"{BaseUrl}/assets/{obj.Symbol.ToUpper()}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = await response.Content.ReadAsStringAsync();
+
+                        return Newtonsoft.Json.JsonConvert.DeserializeObject<AssetsFull>((Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result).asset.ToString()));
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Request failed with status code: " + response.StatusCode);
+                    }
+
+                }
+                return null;
+            }
+            public static async Task<ObservableCollection<CryptoPoint>> GetCryptoPoints(AssetsBase obj, int counPoints = 720)
+            {
+                //
+                using (var httpClient = new HttpClient())
+                {
+                    var response = await httpClient.GetAsync($"https://min-api.cryptocompare.com/data/v2/histohour?fsym={obj.Symbol.ToUpper()}&tsym=USD&limit={counPoints}");
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var result = await response.Content.ReadAsStringAsync();
+                      
+                        return Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<CryptoPoint>>(Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result).Data.Data.ToString());
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Request failed with status code: " + response.StatusCode);
+                    }
+
                 }
                 return null;
             }
