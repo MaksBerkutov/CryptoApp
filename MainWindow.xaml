@@ -7,10 +7,10 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
-       
-      
-            <TabControl>
-                <TabItem Header="Assets">
+
+
+        <TabControl>
+            <TabItem Header="Assets">
                 <Grid >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="160*"/>
@@ -19,21 +19,106 @@
                     </Grid.ColumnDefinitions>
                     <GridSplitter Grid.Column="1" HorizontalAlignment="Left" Height="424" Margin="0,10,0,0" VerticalAlignment="Top" Width="5" Grid.RowSpan="2"/>
                     <GroupBox Header="Menu">
-                        
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+
+                            <GroupBox Header="Base Converter"  VerticalAlignment="Center" >
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding AassetcSelectedItems.Symbol, StringFormat=' {0} TO'}" Margin="0 0 10 0"/>
+                                        <ComboBox ItemsSource="{Binding AssetsItems}" SelectedItem="{Binding AssetsSelectedItemsConvert , Mode=TwoWay}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock Text="{Binding Symbol}"/>
+
+                                                </DataTemplate>
+
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" VerticalAlignment="Center">
+                                        <TextBox Text="{Binding ConvertToCount}"/>
+                                        <TextBlock Margin="10 0" Text="{Binding ConvertResult, StringFormat='Result: {0}'}"/>
+
+                                    </StackPanel>
+                                </StackPanel>
+                            </GroupBox>
+                            <GroupBox Header="Settings"  Grid.Row="1" >
+                                <Grid   VerticalAlignment="Center">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Max Item" HorizontalAlignment="Left"/>
+
+                                    <TextBox Grid.Column="1" HorizontalAlignment="Right" Text="{Binding DefaultTop}"/>
+
+                                </Grid>
+                               
+                            </GroupBox>
+                            <GroupBox Header="Finder"  Grid.Row="2" >
+                                <Grid   VerticalAlignment="Center">
+                                    <TextBox Text="{Binding Finder}"/>
+                                </Grid>
+
+                            </GroupBox>
+
+
+
+
+                        </Grid>
                     </GroupBox>
                     <GroupBox Header="Assets" Grid.Column="1">
+                        <ListBox ItemsSource="{Binding AssetsItems}" SelectedItem="{Binding AassetcSelectedItems, Mode=TwoWay}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="{Binding Image}" Width="50" Height="50" Margin="0,0,10,0"/>
+                                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}"/>
+                                            <TextBlock Text="{Binding Symbol}"/>
+                                          
+                                        </StackPanel>
+                                    </StackPanel>
 
+
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+
+                        </ListBox>
                     </GroupBox>
-                    <GroupBox Header="More Info" Grid.Column="2">
-
+                    <GroupBox Header="More Info" Grid.Column="2" IsEnabled="False">
+                        <Grid >
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Image Grid.RowSpan="2"  Source="{Binding AassetcSelectedItems.Image}" />
+                            <TextBlock Text="{Binding AassetcSelectedItems.Name, StringFormat='Name: {0}'}" Grid.Row="2"/>
+                            <TextBlock Text="{Binding AassetcSelectedItems.Symbol, StringFormat='Symbol: {0}'}" Grid.Row="3"/>
+                            <TextBlock Text="{Binding AassetcSelectedItems.Current_Price, StringFormat='Current Price: {0}'}" Grid.Row="4"/>
+                            <TextBlock Text="{Binding AassetcSelectedItems.Price_Change_Percentage_24h, StringFormat='Price Change 24h: {0}'}" Grid.Row="5"/>
+                          
+                        </Grid>
                     </GroupBox>
                 </Grid>
             </TabItem>
-                <TabItem Header="TabItem">
-                    <Grid Background="#FFE5E5E5"/>
-                </TabItem>
-            </TabControl>
-        
+            <TabItem Header="TabItem">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+
 
 
 

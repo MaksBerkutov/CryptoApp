@@ -8,50 +8,17 @@ using System.Threading.Tasks;
 
 namespace CryptoApp.Module.CryptoLogic
 {
-    public class Assets
-    {
-        private string name, id;
-
-        public Assets(string name, string id)
-        {
-            this.name = name ?? throw new ArgumentNullException(nameof(name));
-            this.id = id ?? throw new ArgumentNullException(nameof(id));
-        }
-
-        public string Name => name;
-        public string Id => id;
-    }
+   
     public class AssetsFull
     {
-        
 
 
-        private string Id;
-        public string ID => Id;
 
-        private string name;
-        public string Name => name;
-
-        decimal price;
-        public decimal Price => price;
-
-        decimal price_unconverted;
-        public decimal PriceUnconverted => price_unconverted;
-
-        decimal spread;
-        public decimal Spread => spread;
-
-        decimal volume_24h;
-        public decimal Volume24h => volume_24h;
-
-        string status;
-        public string Status => status;
-
-        private DateTime created_at;
-        public DateTime CreatedAt => created_at;
-
-        private DateTime updated_at;
-        public DateTime UpdatedAt => updated_at;
+        public string Name { get; set; }
+        public string Image { get; set; }
+        public string Symbol { get; set; }
+        public double Current_Price { get; set; }
+        public double Price_Change_Percentage_24h { get; set; }
     }
     public class ExchangeMarkets
     {
@@ -206,20 +173,19 @@ namespace CryptoApp.Module.CryptoLogic
                 }
             }
 
-            //Отримання монет
-            public static async Task<ObservableCollection< Assets>> GetAssetsAsync()
+            public static  ObservableCollection<AssetsFull> GetAssetsFull(int def)
             {
-                ObservableCollection < Assets > obj = new ObservableCollection< Assets >();
                 using (var httpClient = new HttpClient())
                 {
-                    var response = await httpClient.GetAsync($"{BaseUrl}/assetsoverview");
+                    var response =  httpClient.GetAsync($"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={def}&page=1&sparkline=false").Result;
 
                     if (response.IsSuccessStatusCode)
                     {
-                        var result = await response.Content.ReadAsStringAsync();
-                        dynamic Elements = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);
-                        foreach (var item in Elements.asset)
-                            obj.Add(new Assets(item.name.ToString(), item.asset_id.ToString()));
+                        var result =  response.Content.ReadAsStringAsync().Result;
+                        ObservableCollection<AssetsFull> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsFull>>(result);
+                        return currencies;
+
+
                     }
                     else
                     {
@@ -228,17 +194,18 @@ namespace CryptoApp.Module.CryptoLogic
                 }
                 return null;
             }
-            public static async Task GetAssetsFullAsync(Assets obj)
+            public static async Task<ObservableCollection<AssetsFull>> GetAssetsFullAsync(int def)
             {
                 using (var httpClient = new HttpClient())
                 {
-                    var response = await httpClient.GetAsync($"{BaseUrl}/assets/{obj.Id}");
+                    var response = await httpClient.GetAsync($"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={def}&page=1&sparkline=false");
 
                     if (response.IsSuccessStatusCode)
                     {
                         var result = await response.Content.ReadAsStringAsync();
-                        dynamic Elements = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(result);
-                       
+                        ObservableCollection<AssetsFull> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsFull>>(result);
+                        return currencies;
+
 
                         Console.WriteLine(result);
                     }
@@ -247,6 +214,7 @@ namespace CryptoApp.Module.CryptoLogic
                         Console.WriteLine("Request failed with status code: " + response.StatusCode);
                     }
                 }
+                return null;
             }
 
         }
