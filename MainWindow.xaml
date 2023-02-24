@@ -5,13 +5,15 @@
       
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CryptoApp"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
 
 
         <TabControl>
-            <TabItem Header="Assets">
+            <TabItem Header="{Binding Lang[7]}">
                 <Grid >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="160*"/>
@@ -19,7 +21,7 @@
                         <ColumnDefinition Width="169*"/>
                     </Grid.ColumnDefinitions>
                     <GridSplitter Grid.Column="1" HorizontalAlignment="Left" Height="424" Margin="0,10,0,0" VerticalAlignment="Top" Width="5" Grid.RowSpan="2"/>
-                    <GroupBox Header="Menu" >
+                    <GroupBox Header="{Binding Lang[9]}" >
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
@@ -29,10 +31,17 @@
                                 <RowDefinition />
                             </Grid.RowDefinitions>
 
-                            <GroupBox Header="Base Converter"  VerticalAlignment="Center" IsEnabled="{Binding ItemsNoNull}">
+                            <GroupBox Header="{Binding Lang[10]}"  VerticalAlignment="Center" IsEnabled="{Binding ItemsNoNull}">
                                 <StackPanel>
                                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBlock Text="{Binding AassetcSelectedItems.Symbol, StringFormat=' {0} TO'}" Margin="0 0 10 0"/>
+                                        <TextBlock Margin="0 0 10 0" >
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat=" {0} {1}">
+                                                    <Binding Path="AassetcSelectedItems.Symbol" />
+                                                    <Binding Path="Lang[8]" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
                                         <ComboBox ItemsSource="{Binding AssetsItems}" SelectedItem="{Binding AssetsSelectedItemsConvert , Mode=TwoWay}">
                                             <ComboBox.ItemTemplate>
                                                 <DataTemplate>
@@ -44,28 +53,35 @@
                                         </ComboBox>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal"  HorizontalAlignment="Center" VerticalAlignment="Center">
-                                        <TextBox Text="{Binding ConvertToCount}"/>
-                                        <TextBlock Margin="10 0" Text="{Binding ConvertResult, StringFormat='Result: {0}'}"/>
+                                        <TextBox Text="{Binding ConvertToCount, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
+                                        <TextBlock Margin="10 0" >
+                                            <TextBlock.Text>
+                                                <MultiBinding StringFormat=" {1}: {0}">
+                                                    <Binding Path="ConvertResult" />
+                                                    <Binding Path="Lang[0]" />
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
 
                                     </StackPanel>
                                 </StackPanel>
                             </GroupBox>
-                            <GroupBox Header="Settings"  Grid.Row="1" >
+                            <GroupBox Header="{Binding Lang[11]}"  Grid.Row="1" >
                                 <Grid   VerticalAlignment="Center">
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition/>
                                         <ColumnDefinition/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="Max Item" HorizontalAlignment="Left"/>
+                                    <TextBlock Text="{Binding Lang[12]}" HorizontalAlignment="Left"/>
 
-                                    <TextBox Grid.Column="1" HorizontalAlignment="Right" Text="{Binding DefaultTop}"/>
+                                    <TextBox Grid.Column="1" HorizontalAlignment="Right" Text="{Binding DefaultTop, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
 
                                 </Grid>
-                               
+
                             </GroupBox>
-                            <GroupBox Header="Finder"  Grid.Row="2" >
+                            <GroupBox Header="{Binding Lang[13]}"  Grid.Row="2" >
                                 <Grid   VerticalAlignment="Center">
-                                    <TextBox Text="{Binding Finder}"/>
+                                    <TextBox Text="{Binding Finder, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
                                 </Grid>
 
                             </GroupBox>
@@ -75,7 +91,7 @@
 
                         </Grid>
                     </GroupBox>
-                    <GroupBox Header="Assets" Grid.Column="1">
+                    <GroupBox Header="{Binding Lang[7]}" Grid.Column="1">
                         <ListBox ItemsSource="{Binding AssetsItems}" SelectedItem="{Binding AassetcSelectedItems, Mode=TwoWay}">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
@@ -84,7 +100,7 @@
                                         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                                             <TextBlock Text="{Binding Name}"/>
                                             <TextBlock Text="{Binding Symbol}"/>
-                                          
+
                                         </StackPanel>
                                     </StackPanel>
 
@@ -94,7 +110,7 @@
 
                         </ListBox>
                     </GroupBox>
-                    <GroupBox Header="More Info" Grid.Column="2" IsEnabled="False">
+                    <GroupBox Header="{Binding Lang[1]}" Grid.Column="2" IsEnabled="False">
                         <Grid >
                             <Grid.RowDefinitions>
                                 <RowDefinition />
@@ -106,17 +122,46 @@
                                 <RowDefinition />
                             </Grid.RowDefinitions>
                             <Image Grid.RowSpan="2"  Source="{Binding AassetcSelectedItems.Image}" />
-                            <TextBlock Text="{Binding AassetcSelectedItems.Name, StringFormat='Name: {0}'}" Grid.Row="2"/>
-                            <TextBlock Text="{Binding AassetcSelectedItems.Symbol, StringFormat='Symbol: {0}'}" Grid.Row="3"/>
-                            <TextBlock Text="{Binding AassetcSelectedItems.Current_Price, StringFormat='Current Price: {0}'}" Grid.Row="4"/>
-                            <TextBlock Text="{Binding AassetcSelectedItems.Price_Change_Percentage_24h, StringFormat='Price Change 24h: {0}'}" Grid.Row="5"/>
-                          
+                            <TextBlock Grid.Row="2" >
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat=" {1}: {0}">
+                                        <Binding Path="AassetcSelectedItems.Name" />
+                                        <Binding Path="Lang[2]" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Row="3" >
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat=" {1}: {0}">
+                                        <Binding Path="AassetcSelectedItems.Symbol" />
+                                        <Binding Path="Lang[3]" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Row="4" >
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat=" {1}: {0}">
+                                        <Binding Path="AassetcSelectedItems.Current_Price" />
+                                        <Binding Path="Lang[4]" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Row="5" >
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat=" {1}: {0}">
+                                        <Binding Path="AassetcSelectedItems.Price_Change_Percentage_24h" />
+                                        <Binding Path="Lang[5]" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+
+
                         </Grid>
                     </GroupBox>
                 </Grid>
             </TabItem>
-            <TabItem Header="Full Info" IsEnabled="{Binding ItemsNoNull}" >
-              
+            <TabItem Header="{Binding Lang[6]}" IsEnabled="{Binding ItemsNoNull}" >
+
                 <Grid >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
@@ -136,43 +181,198 @@
                         <RowDefinition/>
                         <RowDefinition/>
                         <RowDefinition/>
-
-
-
-                        
                     </Grid.RowDefinitions>
+
+
+
                     <Image Grid.RowSpan="2"  Source="{Binding AassetcSelectedItems.Image}" Grid.ColumnSpan="2" />
-                    <TextBlock HorizontalAlignment="Center" Text="{Binding AssetsFull.name, StringFormat='Name: {0}'}" Grid.ColumnSpan="2" Grid.Row="2"/>
-                    <TextBox Text="{Binding AssetsFull.description, StringFormat='Description: {0}'}" Grid.ColumnSpan="2" IsReadOnly="True" Grid.Row="3"/>
-                    
-    
-                    <TextBlock Text="{Binding AssetsFull.asset_id, StringFormat='Assets ID: {0}'}" Grid.Row="4"/>
-                    <TextBlock Text="{Binding AassetcSelectedItems.Current_Price, StringFormat='Current Price: {0}'}" Grid.Row="4" Grid.Column="1"/>
-                    <TextBlock Text="{Binding AssetsFull.website, StringFormat='Website: {0}'}" Grid.Row="5" Grid.Column="1"/>
-                    <TextBlock Text="{Binding AssetsFull.status, StringFormat='Status: {0}'}" Grid.Row="5"/>
-                    <TextBlock Text="{Binding AssetsFull.pegged, StringFormat='Pegged: {0}'}" Grid.Row="6"/>
-                    <TextBlock Text="{Binding AssetsFull.volume_24h, StringFormat='Volume 24 h: [{0}]'}" Grid.Row="7"/>
-                    <TextBlock Text="{Binding AssetsFull.change_1h, StringFormat='Change 1 hours: [{0}]'}" Grid.Row="8"/>
-                    <TextBlock Text="{Binding AssetsFull.change_24h, StringFormat='Change 24 hours: [{0}]'}" Grid.Row="9"/>
-                    <TextBlock Text="{Binding AssetsFull.change_7d, StringFormat='Change 7 day: [{0}]'}" Grid.Row="10"/>
-                    <TextBlock Text="{Binding AssetsFull.created_at, StringFormat='Created At: {0}'}" Grid.Row="11"/>
-                    <TextBlock Text="{Binding AssetsFull.updated_at, StringFormat='Updated At: {0}'}" Grid.Row="11" Grid.Column="1"/>
-                    <TextBlock Text="{Binding AssetsFull.circulating_supply, StringFormat='Circulating supply: {0}'}" Grid.Row="10" Grid.Column="1"/>
-                    <TextBlock Text="{Binding AssetsFull.max_supply, StringFormat='Max supply: {0}'}" Grid.Row="9" Grid.Column="1"/>
-                    <TextBlock Text="{Binding AssetsFull.market_cap, StringFormat='Market cap: {0}'}" Grid.Row="8" Grid.Column="1"/>
-                    <TextBlock Text="{Binding AssetsFull.total_supply, StringFormat='Total supply: {0}'}" Grid.Row="7" Grid.Column="1"/>
-                    <TextBlock Text="{Binding AssetsFull.full_diluted_market_cap, StringFormat='Full diluted market cap: {0}'}" Grid.Row="6" Grid.Column="1"/>
-                    <Button Grid.Row="12" Grid.ColumnSpan="2" Content="Go To Site" Command="{Binding GoToSite}"/>
+                    <TextBlock HorizontalAlignment="Center" Grid.ColumnSpan="2" Grid.Row="2">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.name" />
+                                <Binding Path="Lang[2]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBox  Grid.ColumnSpan="2" IsReadOnly="True" Grid.Row="3">
+                        <TextBox.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.description" />
+                                <Binding Path="Lang[14]" />
+                            </MultiBinding>
+                        </TextBox.Text>
+                    </TextBox>
+
+
+                    <TextBlock  Grid.Row="4">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.asset_id" />
+                                <Binding Path="Lang[15]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock  Grid.Row="4" Grid.Column="1">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AassetcSelectedItems.Current_Price" />
+                                <Binding Path="Lang[16]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock  Grid.Row="5" Grid.Column="1">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.website" />
+                                <Binding Path="Lang[17]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock  Grid.Row="5">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.status" />
+                                <Binding Path="Lang[18]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="6">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.pegged" />
+                                <Binding Path="Lang[19]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="7">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: [{0}]">
+                                <Binding Path="AssetsFull.volume_24h" />
+                                <Binding Path="Lang[20]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="8">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: [{0}]">
+                                <Binding Path="AssetsFull.change_1h" />
+                                <Binding Path="Lang[21]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="9">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: [{0}]">
+                                <Binding Path="AssetsFull.change_24h" />
+                                <Binding Path="Lang[22]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="10">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: [{0}]">
+                                <Binding Path="AssetsFull.change_7d" />
+                                <Binding Path="Lang[23]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="11">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.created_at" />
+                                <Binding Path="Lang[24]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="11" Grid.Column="1">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.updated_at" />
+                                <Binding Path="Lang[25]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="10" Grid.Column="1">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.circulating_supply" />
+                                <Binding Path="Lang[26]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock  Grid.Row="9" Grid.Column="1">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.max_supply" />
+                                <Binding Path="Lang[27]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="8" Grid.Column="1">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.market_cap" />
+                                <Binding Path="Lang[28]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="7" Grid.Column="1">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.total_supply" />
+                                <Binding Path="Lang[29]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <TextBlock Grid.Row="6" Grid.Column="1">
+                        <TextBlock.Text>
+                            <MultiBinding StringFormat=" {1}: {0}">
+                                <Binding Path="AssetsFull.full_diluted_market_cap" />
+                                <Binding Path="Lang[30]" />
+                            </MultiBinding>
+                        </TextBlock.Text>
+                    </TextBlock>
+                    <Button Grid.Row="12" Grid.ColumnSpan="2" Content="{Binding Lang[31]}" Command="{Binding GoToSite}"/>
 
 
 
 
                 </Grid>
             </TabItem>
-            <TabItem Header="Cryptographic" IsEnabled="{Binding ItemsNoNull}">
-                <WpfPlot Name="WpfPlot1"/>
+            <TabItem Header="{Binding Lang[33]}" IsEnabled="{Binding ItemsNoNull}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="19*"/>
+                        <RowDefinition Height="184*"/>
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock HorizontalAlignment="Center" Text="{Binding Lang[32]}"/>
+                        <TextBox TextAlignment="Center" Text="{Binding CountOfPoint, UpdateSourceTrigger=PropertyChanged, Delay=500}"/>
+                    </StackPanel>
+                    <WpfPlot Name="WpfPlot1" Grid.Row="1"/>
+                </Grid>
+
+
             </TabItem>
-           
+            <TabItem Header="{Binding Lang[11]}">
+                <Grid >
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="253*"/>
+                        <ColumnDefinition Width="541*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Lang[34]}"/>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Lang[35]}" Grid.Row="1"/>
+                    <ComboBox ItemsSource="{Binding AllLang}" SelectedItem="{Binding SelectedLang}" Grid.Column="1"/>
+                </Grid>
+
+
+            </TabItem>
+
+
         </TabControl>
 
 
