@@ -1,36 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using CryptoApp.Module.Extension;
+using System.Windows;
 
 namespace CryptoApp.Module.ViewModel
 {
-    public enum Theme
-    {
-        White,
-        Black
-    }
-    public class MainWindowViewModel:Base.ViewModel
-    {
-        private static readonly Dictionary<string, string[]> LANG_VALUE = new Dictionary<string, string[]>()
-        {
-            {"En",new string[] {"Result","More Info","Name","Symbol", "Current Price", "Price Change 24h", "Full Info", "Assets","To","Menu", "Base Converter", "Settings", "Max Item", "Finder", //13
-                "Description", "Assets ID", "Current Price", "Website", "Status", "Pegged", "Volume 24 h","Change 1 hours","Change 24 hours","Change 7 day","Created At","Updated At","Circulating supply","Max supply","Market cap",
-                "Total supply","Full diluted market cap","Go To Site","Count Point Min=2 Max=2000","Cryptographic","Lang","Themes","Trade" } },
-             {"Укр",new string[] {"Результат","Докладніше","Назва","Символ", "Поточна ціна", "Зміна ціни 24h", "Вся інформація", "Монети","К","Меню", "Базова конвертація", " Налаштування", "Максимум елементів", "Пошук",
-                 "Опис", "Монети ID", "Текуця ціна", "Веб сайт", "Статус", "Прив'язаний", "Обсяг за 24 години", "Зміни за 1 годину", "Зміни за 24 години", "Зміни за 7 днів","Створено в","Оновлено в","Зворотна пропозиція","Максимальна пропозиція","Ринкова капіталізація",
-                 "Загальна пропозиція","Повна розводнена ринкова капіталізація","На сайт","Кількість точок Мінімум=2 Максимум=2000","Крипто-графік","Мова","Тема","Трейд" } },
-              {"Ру",new string[] {"Результат","Подробнее","Название","Символ", "Текущяя цена", "Изменение цены 24h", "Вся информация", "Монеты","К","Меню", "Базовая конвертация", "Настройки", "Максимум элементов", "Поиск", 
-                "Описание", "Монеты ID", "Текуцяя цена", "Веб сайт", "Статус", "Привязан", "Обём за 24 часа","Изменения за 1 час","Изменения за 24 час","Изменения за 7 дней","Создано в","Обновленно в","Оборотное предложение","Максимальное предложение","Рыночная капитализация",
-                "Общее предложение","Полная разводненная рыночная капитализация","На сайт","Количество точек Минимум=2 Максимум=2000","Крипто-график","Язык","Тема","Трейд" } },
-        };
 
+    public partial class MainWindowViewModel:Base.ViewModel
+    {
+        //Commands
         public Base.Command GoToSite { get; }
         public Base.Command GoToTrade { get; }
+        //private 
         private ObservableCollection<string> _lang;
         private ObservableCollection<CryptoLogic.AssetsBase> _assetcItems;
         private CryptoLogic.AssetsBase _assetcSelectedItems;
@@ -38,25 +22,37 @@ namespace CryptoApp.Module.ViewModel
         private ObservableCollection<CryptoLogic.SellByItem> _sellitems;
         private CryptoLogic.SellByItem _sellitemsselceted;
         private CryptoLogic.AssetsFull _assetsFull;
-        private int _defaultTop = 20;
+        private int _defaultTop = 20; // Default load top 20 assests
         private double _convertToCount = 0;
         private double _convertResult = 0;
         private string _finder;
-        private int _countOfPoint = 720;
-        private string _selectedLang = "En";
+        private int _countOfPoint = 720;// Default count points chart 720 (1 points = 1 hours)
+        private string _selectedLang = "En";//Default Lang En
         private ScottPlot.WpfPlot _plot;
-        private string _selectedTheme = "White";
+        private string _selectedTheme = "White";//Default theme White
 
         public MainWindowViewModel(ScottPlot.WpfPlot plot)
         {
-             
+            //Check internet status 
+            if (!CryptoLogic.CryptingUp.CryptingUpApi.IsInternetAvailable())
+            {
+                MessageBox.Show(ERROR_VALUE[_selectedLang][0], ERROR_VALUE[_selectedLang][1], MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.MainWindow.Close();
+                Application.Current.Shutdown();
+                return;
+            }
+             //Init Default Lang
             _lang = new ObservableCollection<string> (LANG_VALUE[_selectedLang]);
+            //Save variable for building charts
             _plot = plot;
+            //init commands
             GoToSite = new Base.Command(GoToSiteHandler);
             GoToTrade = new Base.Command(GoToTradeHandler);
+            //load acsess
             _assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(_defaultTop));
             
         }
+        //Handlers
         private void GoToTradeHandler(object obj)
         {
             if(_sellitemsselceted!=null)
@@ -67,7 +63,7 @@ namespace CryptoApp.Module.ViewModel
         {
             Process.Start($"https://www.coingecko.com/en/coins/{_assetcSelectedItems.Name.ToLower().Replace(new char[] {'[',']' },"").Replace(" ","-")}");
         }
-        //async
+        //async function
         public async Task LoadSellItems()
         {
             if (_assetcSelectedItems != null)
@@ -94,14 +90,12 @@ namespace CryptoApp.Module.ViewModel
                 y1.Add(p.low);
             });
             _plot.Plot.Clear();
-           
             _plot.Plot.AddScatter(x.ToArray(), y.ToArray(), System.Drawing.Color.Green, 1, 5, ScottPlot.MarkerShape.filledCircle, ScottPlot.LineStyle.Solid, "High");
             _plot.Plot.AddScatter(x.ToArray(), y1.ToArray(),System.Drawing.Color.Red,1,5,ScottPlot.MarkerShape.filledCircle,ScottPlot.LineStyle.Solid,"Low");
-           
             _plot.Refresh();
 
         }
-        //Object
+        //Object for View binding
         public ObservableCollection<CryptoLogic.SellByItem> SellItems
         {
             get => _sellitems;
@@ -194,13 +188,16 @@ namespace CryptoApp.Module.ViewModel
         public int DefaultTop
         {
             get=> _defaultTop; 
-            set { 
-                if (value > 0)
+            set {
+                if (value >= 2 && value <= 225) 
                 {
                     _defaultTop = value;
                     _assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(_defaultTop));
                     OnPropertyChanged(nameof(AssetsItems));
-                }  
+                }
+                OnPropertyChanged(nameof(AssetsItems));
+
+
             }
         }
         public ObservableCollection<string> Lang

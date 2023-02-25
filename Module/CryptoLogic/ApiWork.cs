@@ -1,124 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
+using System.Net.NetworkInformation;
 using CryptoApp.Module.Extension;
 
 
-namespace CryptoApp.Module.CryptoLogic
+namespace CryptoApp.Module.CryptoLogic.CryptingUp
 {
-   public class CryptoPoint
-    {
-        public TimeSpan Time => new TimeSpan(time);
-        public long time { get; set; }
-        public double high { get; set; }
-        public double low { get; set; }
-    }
-    public class AssetsBase
-    {
-
-
-
-        public string Name { get; set; }
-        public string Image { get; set; }
-        public string Symbol { get; set; }
-        public double Current_Price { get; set; }
-        public double Price_Change_Percentage_24h { get; set; }
-    }
-    public class SellByItem
-    {
-        public string IN { get; set; }
-        public string TO { get; set; }
-        public string URL { get; set; }
-    }
-    public class AssetsFull
-    {
-      
-        public string asset_id { get; set; }
-        public string status { get; set; }
-        public string name { get; set; }
-        public string description { get; set; }
-        public string website { get; set; }
-        public string pegged { get; set; }
-        public double volume_24h { get; set; }
-        public double change_1h { get; set; }
-        public double change_24h { get; set; }
-        public double change_7d { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime updated_at { get; set; }
-        public double total_supply { get; set; }
-        public double circulating_supply { get; set; }
-        public double max_supply { get; set; }
-        public long market_cap { get; set; }
-        public long full_diluted_market_cap { get; set; }
-    }
-    public class ExchangeMarkets
-    {
-        //Для навігації
-        public static string Next = null;
-        public static string Pred = null;
-        public static int itemsCount = 10;
-
-        private string exchange_id;
-        public string ExchangeId => exchange_id;
-
-        private string base_asset;
-        public string Base => base_asset;
-
-        decimal spread;
-        public decimal Spread=>spread;
-
-        decimal volume_24h;
-        public decimal Volume24h => volume_24h;
-
-        string status;
-        public string Status => status;
-
-        private string quote_asset;
-        public string Quote => quote_asset;
-
-        private DateTime created_at;
-        public DateTime CreatedAt => created_at;
-
-        private DateTime updated_at;
-        public DateTime UpdatedAt => updated_at;
-
-        public string Symbol => $"{base_asset}-{quote_asset}";
-    }
-
-    public class CryptingExchanges 
-    {
-        private string name;
-        public string Name => name;
-
-        private string exchangesId;
-        public string ExchangesId => exchangesId;
-
-        private decimal circulationOfCrypto;
-        public decimal CirculationOfCrypto => circulationOfCrypto;
-
-        private string website;
-        public string WebSite => website;
-        public CryptingExchanges(string name, string exchangesId, decimal circulationOfCrypto, string website)
-        {
-            this.name = name ?? throw new ArgumentNullException(nameof(name));
-            this.exchangesId = exchangesId ?? throw new ArgumentNullException(nameof(exchangesId));
-            this.circulationOfCrypto = circulationOfCrypto;
-            this.website = website ?? throw new ArgumentNullException(nameof(website));
-        }
-        
-
-    }
-   
-    namespace CryptingUp
-    {
+  
+  
         static class CryptingUpApi
         {
-           
-            private static readonly string BaseUrl = "https://cryptingup.com/api";
+        //Перевіряемо звязок
+        public static bool IsInternetAvailable()
+        {
+            try
+            {
+                using (var ping = new Ping())
+                {
+                    var result = ping.Send("8.8.8.8", 2000); 
+                    return result.Status == IPStatus.Success;
+                }
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static readonly string BaseUrl = "https://cryptingup.com/api";
             //Отримуємо всі біржі  == Не знадобилося
             public static async Task<ObservableCollection<CryptingExchanges>> GetExchanges()
             {
@@ -366,5 +278,5 @@ namespace CryptoApp.Module.CryptoLogic
             }
 
         }
-    }
+    
 }

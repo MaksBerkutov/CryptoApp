@@ -95,10 +95,18 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Module\CryptoLogic\CryptoLoader.cs" />
+    <Compile Include="Module\CryptoLogic\ApiWork.cs" />
     <Compile Include="Module\Extension\Extension.cs" />
+    <Compile Include="Module\Model\AssetsBase.cs" />
+    <Compile Include="Module\Model\AssetsFull.cs" />
+    <Compile Include="Module\Model\CryptoPoint.cs" />
+    <Compile Include="Module\Model\ExchangeMarkets.cs" />
+    <Compile Include="Module\Model\CryptingExchanges.cs" />
+    <Compile Include="Module\Model\SellByItem.cs" />
+    <Compile Include="Module\ViewModel\Base\Lang.cs" />
     <Compile Include="Module\ViewModel\Base\ViewModel.cs" />
     <Compile Include="Module\ViewModel\MainWindowViewModel.cs" />
+    <Compile Include="Module\ViewModel\Theme.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
