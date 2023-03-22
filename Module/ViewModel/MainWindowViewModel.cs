@@ -36,13 +36,13 @@ namespace CryptoApp.Module.ViewModel
             //Check internet status 
             if (!CryptoLogic.CryptingUp.CryptingUpApi.IsInternetAvailable())
             {
-                MessageBox.Show(ERROR_VALUE[_selectedLang][0], ERROR_VALUE[_selectedLang][1], MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ErrorValue[_selectedLang][0], ErrorValue[_selectedLang][1], MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.MainWindow.Close();
                 Application.Current.Shutdown();
                 return;
             }
              //Init Default Lang
-            _lang = new ObservableCollection<string> (LANG_VALUE[_selectedLang]);
+            _lang = new ObservableCollection<string> (LangValue[_selectedLang]);
             //Save variable for building charts
             _plot = plot;
             //init commands
@@ -85,9 +85,9 @@ namespace CryptoApp.Module.ViewModel
 
             points.ToList().ForEach(p =>
             {
-                x.Add(p.time);
-                y.Add(p.high);
-                y1.Add(p.low);
+                x.Add(p.Time);
+                y.Add(p.High);
+                y1.Add(p.Low);
             });
             _plot.Plot.Clear();
             _plot.Plot.AddScatter(x.ToArray(), y.ToArray(), System.Drawing.Color.Green, 1, 5, ScottPlot.MarkerShape.filledCircle, ScottPlot.LineStyle.Solid, "High");
@@ -128,14 +128,14 @@ namespace CryptoApp.Module.ViewModel
                 }
             }
         }
-        public string[] AllLang => LANG_VALUE.Keys.ToArray();
+        public string[] AllLang => LangValue.Keys.ToArray();
         public string SelectedLang
         {
             get=> _selectedLang;
             set
             {
 
-                Lang = new ObservableCollection<string>(LANG_VALUE[value]);
+                Lang = new ObservableCollection<string>(LangValue[value]);
                 _selectedLang = value;
             }
         }
@@ -228,7 +228,7 @@ namespace CryptoApp.Module.ViewModel
                 if(value>0&& _assetcSelectedItems!=null&& AssetsSelectedItemsConvert != null)
                 {
                     _convertToCount = value;
-                    var course = _assetcItems.ToList().Find(x => x.Symbol == _assetcSelectedItems.Symbol).Current_Price / _assetcItems.ToList().Find(x => x.Symbol == AssetsSelectedItemsConvert.Symbol).Current_Price;
+                    var course = _assetcItems.ToList().Find(x => x.Symbol == _assetcSelectedItems.Symbol).CurrentPrice / _assetcItems.ToList().Find(x => x.Symbol == AssetsSelectedItemsConvert.Symbol).CurrentPrice;
                     _convertResult = _convertToCount * course;
                     OnPropertyChanged(nameof(ConvertToCount));
                     OnPropertyChanged(nameof(ConvertResult));

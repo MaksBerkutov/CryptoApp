@@ -1,27 +1,44 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 
 
 namespace CryptoApp.Module.CryptoLogic
 {
     public class AssetsFull
     {
-
-        public string asset_id { get; set; }
-        public string status { get; set; }
-        public string name { get; set; }
-        public string description { get; set; }
-        public string website { get; set; }
-        public string pegged { get; set; }
-        public double volume_24h { get; set; }
-        public double change_1h { get; set; }
-        public double change_24h { get; set; }
-        public double change_7d { get; set; }
-        public DateTime created_at { get; set; }
-        public DateTime updated_at { get; set; }
-        public double total_supply { get; set; }
-        public double circulating_supply { get; set; }
-        public double max_supply { get; set; }
-        public long market_cap { get; set; }
+        [JsonProperty("asset_id")]
+        public string AssetId { get; set; }
+        [JsonProperty("status")]
+        public string Status { get; set; }
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("description")]
+        public string Description { get; set; }
+        [JsonProperty("website")]
+        public string Website { get; set; }
+        [JsonProperty("pegged")]
+        public string Pegged { get; set; }
+        [JsonProperty("volume_24h")]
+        public double Volume24H { get; set; }
+        [JsonProperty("change_1h")]
+        public double Change1H { get; set; }
+        [JsonProperty("change_24h")]
+        public double Change24H { get; set; }
+        [JsonProperty("change_7d")]
+        public double Change7D { get; set; }
+        [JsonProperty("created_at")]
+        public DateTime CreatedAt { get; set; }
+        [JsonProperty("updated_at")]
+        public DateTime UpdatedAt { get; set; }
+        [JsonProperty("total_supply")]
+        public double TotalSupply { get; set; }
+        [JsonProperty("circulating_supply")]
+        public double CirculatingSupply { get; set; }
+        [JsonProperty("max_supply")]
+        public double MaxSupply { get; set; }
+        [JsonProperty("market_cap")]
+        public long MarketCap { get; set; }
+        [JsonProperty("FullDilutedMarketCap")]
         public long full_diluted_market_cap { get; set; }
     }
 

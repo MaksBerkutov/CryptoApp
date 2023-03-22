@@ -5,10 +5,10 @@ namespace CryptoApp.Module.CryptoLogic
 {
     public class CryptoPoint
     {
-        public TimeSpan Time => new TimeSpan(time);
-        public long time { get; set; }
-        public double high { get; set; }
-        public double low { get; set; }
+        public TimeSpan TimeConvert => new TimeSpan(Time);
+        public long Time { get; set; }
+        public double High { get; set; }
+        public double Low { get; set; }
     }
 
 }

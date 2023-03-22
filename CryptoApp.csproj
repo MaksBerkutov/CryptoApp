@@ -100,8 +100,6 @@
     <Compile Include="Module\Model\AssetsBase.cs" />
     <Compile Include="Module\Model\AssetsFull.cs" />
     <Compile Include="Module\Model\CryptoPoint.cs" />
-    <Compile Include="Module\Model\ExchangeMarkets.cs" />
-    <Compile Include="Module\Model\CryptingExchanges.cs" />
     <Compile Include="Module\Model\SellByItem.cs" />
     <Compile Include="Module\ViewModel\Base\Lang.cs" />
     <Compile Include="Module\ViewModel\Base\ViewModel.cs" />
