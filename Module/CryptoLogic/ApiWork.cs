@@ -32,15 +32,15 @@ namespace CryptoApp.Module.CryptoLogic.CryptingUp
         }
         
         //Отримання топу крипто монет
-        public static ObservableCollection<AssetsBase> GetAssetsBase(int maximum)
+        public static async Task<ObservableCollection<AssetsBase>> GetAssetsBase(int maximum)
         {
             using (var httpClient = new HttpClient())
             {
-                var response = httpClient.GetAsync($"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={maximum}&page=1&sparkline=false").Result;
+                var response = await httpClient.GetAsync($"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page={maximum}&page=1&sparkline=false");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = response.Content.ReadAsStringAsync().Result;
+                    var result = await response.Content.ReadAsStringAsync();
                     ObservableCollection<AssetsBase> currencies = Newtonsoft.Json.JsonConvert.DeserializeObject<ObservableCollection<AssetsBase>>(result);
                     return currencies;
 
@@ -51,7 +51,6 @@ namespace CryptoApp.Module.CryptoLogic.CryptingUp
                     throw new Exception("Request failed with status code: " + response.StatusCode);
                 }
             }
-            return null;
         }
         public static async Task<ObservableCollection<AssetsBase>> GetAssetsBaseAsync(int maximum)
         {
@@ -97,7 +96,7 @@ namespace CryptoApp.Module.CryptoLogic.CryptingUp
         {
             using (var httpClient = new HttpClient())
             {
-                var response = httpClient.GetAsync($"{BaseUrl}/assets/{obj.Symbol.ToUpper()}/markets").Result;
+                var response = await httpClient.GetAsync($"{BaseUrl}/assets/{obj.Symbol.ToUpper()}/markets");
 
                 if (response.IsSuccessStatusCode)
                     await response.Content.ReadAsStringAsync();
@@ -107,13 +106,13 @@ namespace CryptoApp.Module.CryptoLogic.CryptingUp
             }
         }
 
-        public static AssetsFull GetFullAssets(AssetsBase obj)
+        public static async Task<AssetsFull> GetFullAssets(AssetsBase obj)
         {
             using (var httpClient = new HttpClient())
             {
-                var response = httpClient.GetAsync($"{BaseUrl}/assets/{obj.Symbol.ToUpper()}").Result;
+                var response = await httpClient.GetAsync($"{BaseUrl}/assets/{obj.Symbol.ToUpper()}");
                 if (response.IsSuccessStatusCode)
-                    return Newtonsoft.Json.JsonConvert.DeserializeObject<AssetsFull>((Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(response.Content.ReadAsStringAsync().Result).asset.ToString()));
+                    return Newtonsoft.Json.JsonConvert.DeserializeObject<AssetsFull>((Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync()).asset.ToString()));
                 else
                    throw new Exception("Request failed with status code: " + response.StatusCode);
 

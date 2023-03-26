@@ -14,70 +14,58 @@ namespace CryptoApp.Module.ViewModel
         //Commands
         public Base.Command GoToSite { get; }
         public Base.Command GoToTrade { get; }
-        //private 
-        private ObservableCollection<string> _lang;
-        private ObservableCollection<CryptoLogic.AssetsBase> _assetcItems;
-        private CryptoLogic.AssetsBase _assetcSelectedItems;
-        private CryptoLogic.AssetsBase _assetcSelectedItemsConvert;
-        private ObservableCollection<CryptoLogic.SellByItem> _sellitems;
-        private CryptoLogic.SellByItem _sellitemsselceted;
-        private CryptoLogic.AssetsFull _assetsFull;
-        private int _defaultTop = 20; // Default load top 20 assests
-        private double _convertToCount = 0;
-        private double _convertResult = 0;
-        private string _finder;
-        private int _countOfPoint = 720;// Default count points chart 720 (1 points = 1 hours)
-        private string _selectedLang = "En";//Default Lang En
-        private ScottPlot.WpfPlot _plot;
-        private string _selectedTheme = "White";//Default theme White
+     
+       
 
-        public MainWindowViewModel(ScottPlot.WpfPlot plot)
+        public MainWindowViewModel(ScottPlot.WpfPlot inputPlot)
         {
             //Check internet status 
             if (!CryptoLogic.CryptingUp.CryptingUpApi.IsInternetAvailable())
             {
-                MessageBox.Show(ErrorValue[_selectedLang][0], ErrorValue[_selectedLang][1], MessageBoxButton.OK, MessageBoxImage.Error);
+                MessageBox.Show(ErrorValue[selectedLang][0], ErrorValue[selectedLang][1], MessageBoxButton.OK, MessageBoxImage.Error);
                 Application.Current.MainWindow.Close();
                 Application.Current.Shutdown();
                 return;
             }
              //Init Default Lang
-            _lang = new ObservableCollection<string> (LangValue[_selectedLang]);
+            _lang = new ObservableCollection<string> (LangValue[selectedLang]);
             //Save variable for building charts
-            _plot = plot;
+            plot = inputPlot;
             //init commands
             GoToSite = new Base.Command(GoToSiteHandler);
             GoToTrade = new Base.Command(GoToTradeHandler);
             //load acsess
-            _assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(_defaultTop));
+            var task = Task.Run(() => CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(defaultTop));
+            task.Wait();
+            assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(task.Result);
             
         }
         //Handlers
         private void GoToTradeHandler(object obj)
         {
-            if(_sellitemsselceted!=null)
-                Process.Start(_sellitemsselceted.URL);
+            if(sellitemsselceted!=null)
+                Process.Start(sellitemsselceted.URL);
 
         }
         private void GoToSiteHandler(object obj)
         {
-            Process.Start($"https://www.coingecko.com/en/coins/{_assetcSelectedItems.Name.ToLower().Replace(new char[] {'[',']' },"").Replace(" ","-")}");
+            Process.Start($"https://www.coingecko.com/en/coins/{assetcSelectedItems.Name.ToLower().Replace(new char[] {'[',']' },"").Replace(" ","-")}");
         }
         //async function
         public async Task LoadSellItems()
         {
-            if (_assetcSelectedItems != null)
-               SellItems = await CryptoLogic.CryptingUp.CryptingUpApi.GetPriceAcsessAsync(_assetcSelectedItems);
+            if (assetcSelectedItems != null)
+               SellItems = await CryptoLogic.CryptingUp.CryptingUpApi.GetPriceAcsessAsync(assetcSelectedItems);
         }
         public async Task LoadFullInfo()
         {
-            if (_assetcSelectedItems != null)
-                AssetsFull = await CryptoLogic.CryptingUp.CryptingUpApi.GetFullAssetsAsync(_assetcSelectedItems);
+            if (assetcSelectedItems != null)
+                AssetsFull = await CryptoLogic.CryptingUp.CryptingUpApi.GetFullAssetsAsync(assetcSelectedItems);
         }
         public async Task BuildGraphics()
         {
-            if (_assetcSelectedItems == null) return;
-            var points = await CryptoLogic.CryptingUp.CryptingUpApi.GetCryptoPoints(_assetcSelectedItems,_countOfPoint);
+            if (assetcSelectedItems == null) return;
+            var points = await CryptoLogic.CryptingUp.CryptingUpApi.GetCryptoPoints(assetcSelectedItems,countOfPoint);
             List<double>x=new List<double>();   
             List<double>y=new List<double>();   
             List<double>y1=new List<double>();   
@@ -89,28 +77,29 @@ namespace CryptoApp.Module.ViewModel
                 y.Add(p.High);
                 y1.Add(p.Low);
             });
-            _plot.Plot.Clear();
-            _plot.Plot.AddScatter(x.ToArray(), y.ToArray(), System.Drawing.Color.Green, 1, 5, ScottPlot.MarkerShape.filledCircle, ScottPlot.LineStyle.Solid, "High");
-            _plot.Plot.AddScatter(x.ToArray(), y1.ToArray(),System.Drawing.Color.Red,1,5,ScottPlot.MarkerShape.filledCircle,ScottPlot.LineStyle.Solid,"Low");
-            _plot.Refresh();
+            plot.Plot.Clear();
+            plot.Plot.AddScatter(x.ToArray(), y.ToArray(), System.Drawing.Color.Green, 1, 5, ScottPlot.MarkerShape.filledCircle, ScottPlot.LineStyle.Solid, "High");
+            plot.Plot.AddScatter(x.ToArray(), y1.ToArray(),System.Drawing.Color.Red,1,5,ScottPlot.MarkerShape.filledCircle,ScottPlot.LineStyle.Solid,"Low");
+            plot.Refresh();
 
         }
+      
         //Object for View binding
         public ObservableCollection<CryptoLogic.SellByItem> SellItems
         {
-            get => _sellitems;
+            get => sellitems;
             set
             {
-                _sellitems = value;
+                sellitems = value;
                 OnPropertyChanged(nameof(SellItems));
             }
         }
         public CryptoLogic.SellByItem SellItemsSelected
         {
-            get => _sellitemsselceted;
+            get => sellitemsselceted;
             set
             {
-                _sellitemsselceted = value;
+                sellitemsselceted = value;
                 OnPropertyChanged(nameof(SellItemsSelected));
             }
         }
@@ -118,12 +107,12 @@ namespace CryptoApp.Module.ViewModel
         public string[] AllTheme => System.Enum.GetNames(typeof(Theme));
         public string SelectedTheme
         {
-            get { return _selectedTheme; }
+            get { return selectedTheme; }
             set
             {
-                if (_selectedTheme != value)
+                if (selectedTheme != value)
                 {
-                    _selectedTheme = value;
+                    selectedTheme = value;
                     OnPropertyChanged(nameof(SelectedTheme));
                 }
             }
@@ -131,23 +120,23 @@ namespace CryptoApp.Module.ViewModel
         public string[] AllLang => LangValue.Keys.ToArray();
         public string SelectedLang
         {
-            get=> _selectedLang;
+            get=> selectedLang;
             set
             {
 
                 Lang = new ObservableCollection<string>(LangValue[value]);
-                _selectedLang = value;
+                selectedLang = value;
             }
         }
         public string Title => "CryptoApp";
         public int CountOfPoint
         {
-            get => _countOfPoint;
+            get => countOfPoint;
             set
             {
                 if (value >= 2 && value <= 2000)
                 {
-                    _countOfPoint = value;
+                    countOfPoint = value;
                     BuildGraphics();
                     
 
@@ -158,41 +147,45 @@ namespace CryptoApp.Module.ViewModel
         }
         public CryptoLogic.AssetsFull AssetsFull
         {
-            get => _assetsFull;
+            get => assetsFull;
             set
             {
-                _assetsFull = value;
+                assetsFull = value;
                 OnPropertyChanged(nameof(AssetsFull));
             }
         }
-        public bool ItemsNoNull => _assetcSelectedItems != null;
+        public bool ItemsNoNull => assetcSelectedItems != null;
         public string Finder
         {
-            get => _finder;
+            get => finder;
             set
             {
-                _finder = value;
-                if (_finder.Replace(" ","").Any())
+                finder = value;
+                if (finder.Replace(" ","").Any())
                 {
-                    _assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(_defaultTop).
-                       ToList().FindAll(x => x.Name.Contains(_finder) || x.Symbol.Contains(_finder)).ToArray());
+                    var task = Task.Run(() => CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(defaultTop));
+                    task.Wait();
+                    assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(task.Result.
+                       ToList().FindAll(x => x.Name.Contains(finder) || x.Symbol.Contains(finder)).ToArray());
                     OnPropertyChanged(nameof(AssetsItems));
 
                 }
 
 
 
-                else DefaultTop = _defaultTop;
+                else DefaultTop = defaultTop;
             }
         }
         public int DefaultTop
         {
-            get=> _defaultTop; 
+            get=> defaultTop; 
             set {
                 if (value >= 2 && value <= 225) 
                 {
-                    _defaultTop = value;
-                    _assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(_defaultTop));
+                    defaultTop = value;
+                    var task = Task.Run(() => CryptoLogic.CryptingUp.CryptingUpApi.GetAssetsBase(defaultTop));
+                    task.Wait();
+                    assetcItems = new ObservableCollection<CryptoLogic.AssetsBase>(task.Result);
                     OnPropertyChanged(nameof(AssetsItems));
                 }
                 OnPropertyChanged(nameof(AssetsItems));
@@ -213,23 +206,23 @@ namespace CryptoApp.Module.ViewModel
         }
         public ObservableCollection<CryptoLogic.AssetsBase> AssetsItems
         {
-            get => _assetcItems;
+            get => assetcItems;
         }
         public double ConvertResult
         {
-            get => _convertResult;
+            get => convertResult;
           
         }
         public double ConvertToCount
         {
-            get => _convertToCount;
+            get => convertToCount;
             set
             {
-                if(value>0&& _assetcSelectedItems!=null&& AssetsSelectedItemsConvert != null)
+                if(value>0&& assetcSelectedItems!=null&& AssetsSelectedItemsConvert != null)
                 {
-                    _convertToCount = value;
-                    var course = _assetcItems.ToList().Find(x => x.Symbol == _assetcSelectedItems.Symbol).CurrentPrice / _assetcItems.ToList().Find(x => x.Symbol == AssetsSelectedItemsConvert.Symbol).CurrentPrice;
-                    _convertResult = _convertToCount * course;
+                    convertToCount = value;
+                    var course = assetcItems.ToList().Find(x => x.Symbol == assetcSelectedItems.Symbol).CurrentPrice / assetcItems.ToList().Find(x => x.Symbol == AssetsSelectedItemsConvert.Symbol).CurrentPrice;
+                    convertResult = convertToCount * course;
                     OnPropertyChanged(nameof(ConvertToCount));
                     OnPropertyChanged(nameof(ConvertResult));
 
@@ -238,13 +231,13 @@ namespace CryptoApp.Module.ViewModel
         }
         public CryptoLogic.AssetsBase AassetcSelectedItems 
         {
-            get => _assetcSelectedItems; 
+            get => assetcSelectedItems; 
             set
             {
-                if (_assetcSelectedItems != value)
+                if (assetcSelectedItems != value)
                 {
-                    _assetcSelectedItems = value;
-                    ConvertToCount = _convertToCount;
+                    assetcSelectedItems = value;
+                    ConvertToCount = convertToCount;
                     LoadSellItems();
                     LoadFullInfo();
                     BuildGraphics();
@@ -255,16 +248,32 @@ namespace CryptoApp.Module.ViewModel
         }
         public CryptoLogic.AssetsBase AssetsSelectedItemsConvert
         {
-            get => _assetcSelectedItemsConvert;
+            get => assetcSelectedItemsConvert;
             set
             {
-                if (_assetcSelectedItemsConvert != value)
+                if (assetcSelectedItemsConvert != value)
                 {
-                    _assetcSelectedItemsConvert = value;
-                    ConvertToCount = _convertToCount;
+                    assetcSelectedItemsConvert = value;
+                    ConvertToCount = convertToCount;
                     OnPropertyChanged(nameof(AssetsSelectedItemsConvert));
                 }
             }
         }
+
+        private ObservableCollection<string> _lang;
+        private ObservableCollection<CryptoLogic.AssetsBase> assetcItems;
+        private CryptoLogic.AssetsBase assetcSelectedItems;
+        private CryptoLogic.AssetsBase assetcSelectedItemsConvert;
+        private ObservableCollection<CryptoLogic.SellByItem> sellitems;
+        private CryptoLogic.SellByItem sellitemsselceted;
+        private CryptoLogic.AssetsFull assetsFull;
+        private int defaultTop = 20; // Default load top 20 assests
+        private double convertToCount = 0;
+        private double convertResult = 0;
+        private string finder;
+        private int countOfPoint = 720;// Default count points chart 720 (1 points = 1 hours)
+        private string selectedLang = "En";//Default Lang En
+        private ScottPlot.WpfPlot plot;
+        private string selectedTheme = "White";//Default theme White
     }
 }
